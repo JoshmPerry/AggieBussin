@@ -1,5 +1,5 @@
 import pymongo
-import scraper.py
+import scraper
 
 conn_str = "mongodb+srv://JoshmPerry:duPLYKDpBM11HfbB@cluster0.cana0cv.mongodb.net/test?retryWrites=true&w=majority"
 
@@ -12,7 +12,7 @@ pathtoWebdriver="..\\chromedriver_win32\\chromedriver.exe"
 
 
 collection.drop()
-for curbus in get_bus_schedule(URL,routes,pathtoWebdriver):
+for curbus in scraper.get_bus_schedule(URL,routes,pathtoWebdriver):
     dictionaryToAdd={"_id":curbus.getName().split()[0],"BusName":curbus.getName(),"Stops":curbus.getStops(),"Today":bool(curbus.getStops())}
     collection.insert_one(dictionaryToAdd)
 
