@@ -13,7 +13,7 @@ class bus(object):
 	def addStop(self,stop):
 		"""stop should be a list with the first element as a string of the stop location
 		and the second element another list of the stop times stored in military time"""
-		self.stops+=[[stop]]
+		self.stops+=[stop]
 	
 	def getName(self):
 		return self.name
