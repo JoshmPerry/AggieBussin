@@ -1,12 +1,10 @@
 ### IMPORTS ###
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 import time
+
 ### BUS CLASS ###
-
 class bus(object):
-
 
 	def __init__(self,n1="Rev12"):
 		self.name=n1
@@ -31,6 +29,7 @@ class bus(object):
 
 
 def get_bus_schedule(root_web_URL, routes, local_path_to_webdriver ):
+
     bus_list=[]
 
     ### OPEN WEBSITE ###
@@ -86,11 +85,5 @@ def get_bus_schedule(root_web_URL, routes, local_path_to_webdriver ):
 
         bus_list += [currentBus]
 
-
     return bus_list
-    #[[rev12,[[trigon, [t1, t2...]][][][]]],[],[],[]]
-
-
-### GET THE DATA FROM EACH TABLE ELEMENT ###
-# templist=[bus_table_element_ids[0]] #comment this line out later
-
+    
