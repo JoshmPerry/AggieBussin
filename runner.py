@@ -9,6 +9,6 @@ collection = database["oplog.rs"]
 #customers.drop()
 #collection.insert_one({"_id":1,"job":"Python"})
 
-print(collection.)
+print(collection)
 print("finished")
 
