@@ -48,9 +48,9 @@ def get_bus_schedule(root_web_URL, routes, local_path_to_webdriver ):
     bus_table_element_ids = []
     route_numbers = routes#{12,15,22,26,27,31,34,35,36,40,47,48, '47-48', 'N15'}
     for route_num in route_numbers:
-        time.sleep(0.5)
         URL = root_web_URL + str(route_num)
         driver.get(URL)
+        time.sleep(0.1)
         table_id = driver.find_element(By.CLASS_NAME,"timetable")
         #bus_table_element_ids += [table_id]
         
@@ -61,7 +61,7 @@ def get_bus_schedule(root_web_URL, routes, local_path_to_webdriver ):
         bus_stop_location_elements = (table_id.find_elements(By.TAG_NAME, "th"))[2:]
         bus_stops = []
         for element in bus_stop_location_elements:
-            bus_stops += [[], element.text, []]
+            bus_stops += [[[], element.text, []]]
         
         times_lr_ud_ids = table_id.find_elements(By.TAG_NAME, 'time')
         times_lr_ud = []
