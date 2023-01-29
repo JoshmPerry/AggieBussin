@@ -112,6 +112,27 @@ def find_bus_for_stops(locationA, locationB, list2):
         
     return [best_bus, best_depart_time, best_time]
 
+signal = 'x'
+while signal != 'q':
+    print("\n\n\nWelcome to the bus schedule helper!\nWhere would you like to depart from?")
+    stops = get_stops_today()
+    for i in range(len(stops)):
+        print(str(i)+ ": " + str(stops[i]))
+    signal = (input("Enter the number corresponding to your choice (or Q to quit): ")).upper()
+    if(signal == 'Q'):
+        break
+    depart = stops[int(signal)]
+    print("\n\nWhere would you like to arrive?")
+    for i in range(len(stops)):
+        print(str(i)+ ": " + str(stops[i]))
+    signal = (input("Enter the number corresponding to your choice (or Q to quit): ")).upper()
+    if(signal == 'Q'):
+        break
+    arrive = stops[int(signal)]
+
+    x = find_bus_for_stops(depart, arrive, final_list)
+    print("To arrive at your destination the fastest, take bus", str(x[0])+", which departs from", depart, "bus stop at", str(x[1])+'.\nYour ride is expected to take about', str(x[2]), "minutes.")
+
 
 # while True:
 #     x = find_bus_for_stops(input("enter the start location: "),input("enter destination: "),list1)
