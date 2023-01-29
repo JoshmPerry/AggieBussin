@@ -10,13 +10,13 @@ routes={12,15,22,26,27,31,34,35,36,40,47,48, '47-48', 'N15'}
 URL='https://transport.tamu.edu/busroutes/Routes.aspx?r='
 pathtoWebdriver="..\\chromedriver_win32\\chromedriver.exe"
 
-
+print("Starting Uploading process...")
 collection.drop()
 for num,curbus in enumerate(scraper.get_bus_schedule(URL,routes,pathtoWebdriver)):
-    #print(curbus.getName())
+    print("Uploading",curbus.getName(),"to Database.")
     for num2,stop in enumerate(curbus.getStops()):
-        dictionaryToAdd={"_id":num*100+num2,"BusName":curbus.getName(),"Stops":stop}
-    collection.insert_one(dictionaryToAdd)
+        dictionaryToAdd={"_id":num*100+num2,"BusName":curbus.getName(),"Arrival":stop[0],"Departure":stop[2],"Location":stop[1]}
+        collection.insert_one(dictionaryToAdd)
 
 
 print("finished")

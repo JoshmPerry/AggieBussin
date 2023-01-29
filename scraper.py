@@ -76,7 +76,19 @@ def get_bus_schedule(root_web_URL, routes, local_path_to_webdriver ):
                 None
         for i in range(len(times_lr_ud)):
             n = len(bus_stops)
-            bus_stops[i%n][2] += [times_lr_ud[i]]
+            if(i%n == 0 and i-1 >= 0): #if this is the first stop in the cycle, after the start of the day
+                bus_stops[i%n][0] += [times_lr_ud[i-1]] #it has a special arrival time
+            else: #on normal stops, arival is one minute prior to departure
+                bus_stops[i%n][0] += [times_lr_ud[i] - 1]
+            
+            if(i%n == n-1): #if we are on the last stop in each cycle, but not end of day
+                if (i+1 < len(times_lr_ud)): #if end of day
+                    bus_stops[i%n][2] += [-1] #bus at end of day does not depart
+                else:
+                    bus_stops[i%n][2] += [times_lr_ud[i+1]]#bus does not depart until the next cycle
+            else:#otherwise the bus departs at the listed stop time
+                bus_stops[i%n][2] += [times_lr_ud[i]]
+            
 
         print(bus_stops)
 
