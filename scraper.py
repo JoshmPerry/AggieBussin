@@ -85,7 +85,10 @@ def get_bus_schedule(root_web_URL, routes, local_path_to_webdriver ):
                 if (i+1 < len(times_lr_ud)): #if end of day
                     bus_stops[i%n][2] = -1 #bus at end of day does not depart
                 else:
-                    bus_stops[i%n][2] = times_lr_ud[i+1]#bus does not depart until the next cycle
+                    try:
+                        bus_stops[i%n][2] = times_lr_ud[i+1]#bus does not depart until the next cycle
+                    except:
+                        bus_stops[i%n][2]=times_lr_ud[i]
             else:#otherwise the bus departs at the listed stop time
                 bus_stops[i%n][2] = times_lr_ud[i]
             

@@ -6,7 +6,7 @@ conn_str = "mongodb+srv://JoshmPerry:duPLYKDpBM11HfbB@cluster0.cana0cv.mongodb.n
 client = pymongo.MongoClient(conn_str, serverSelectionTimeoutMS=5000)
 database = client["mydatabase"]
 collection = database["buses"]
-routes={12,15,22,26,27,31,34,35,36,40,47,48, '47-48', 'N15'}
+routes={12,15,22,26,27,31,34,35,36,40,47,48, '47-48', 'N15',"01","01-04","03","03-05","04","05","06","07","08"}
 URL='https://transport.tamu.edu/busroutes/Routes.aspx?r='
 pathtoWebdriver="..\\chromedriver_win32\\chromedriver.exe"
 
