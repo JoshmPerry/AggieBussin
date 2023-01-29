@@ -14,10 +14,16 @@ print("Starting Uploading process...")
 collection.drop()
 for num,curbus in enumerate(scraper.get_bus_schedule(URL,routes,pathtoWebdriver)):
     print("Uploading",curbus.getName(),"to Database.")
-    for num2,stop in enumerate(curbus.getStops()):
-        dictionaryToAdd={"_id":num*100+num2,"BusName":curbus.getName(),"Arrival":stop[0],"Departure":stop[2],"Location":stop[1]}
-        collection.insert_one(dictionaryToAdd)
+    #for num2,stop in enumerate(curbus.getStops()):
+        #if(stop[0]!=0 or stop[2]!=0):
+            #dictionaryToAdd={"_id":num*100+num2,"BusName":curbus.getName(),"Arrival":stop[0],"Departure":stop[2],"Location":stop[1]}
+    dictionaryToAdd={"_id":num,"BusName":curbus.getName(),"Stop":curbus.getStops()}
+    collection.insert_one(dictionaryToAdd)
 
 
 print("finished")
+
+#bus = [[ariv,location1,depart],[ariv,location2,depart],[aric,location1,depart]]
+#bus = [[]]
+
 

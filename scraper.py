@@ -55,13 +55,13 @@ def get_bus_schedule(root_web_URL, routes, local_path_to_webdriver ):
         #bus_table_element_ids += [table_id]
         
         bus_name = (table_id.find_element(By.CLASS_NAME, "Route")).text
-        print("\n" + bus_name)
+        print("Currently Scrapping",bus_name)
         currentBus=bus(bus_name)
         location_id_code = "BGRouteColor RouteColorCompliment Route" + str(route_num)
         bus_stop_location_elements = (table_id.find_elements(By.TAG_NAME, "th"))[2:]
         bus_stops = []
         for element in bus_stop_location_elements:
-            bus_stops += [[[], element.text, []]]
+            bus_stops += [[0, element.text, 0]]
         
         times_lr_ud_ids = table_id.find_elements(By.TAG_NAME, 'time')
         times_lr_ud = []
@@ -77,20 +77,20 @@ def get_bus_schedule(root_web_URL, routes, local_path_to_webdriver ):
         for i in range(len(times_lr_ud)):
             n = len(bus_stops)
             if(i%n == 0 and i-1 >= 0): #if this is the first stop in the cycle, after the start of the day
-                bus_stops[i%n][0] += [times_lr_ud[i-1]] #it has a special arrival time
+                bus_stops[i%n][0] = times_lr_ud[i-1] #it has a special arrival time
             else: #on normal stops, arival is one minute prior to departure
-                bus_stops[i%n][0] += [times_lr_ud[i] - 1]
+                bus_stops[i%n][0] = times_lr_ud[i] - 1
             
             if(i%n == n-1): #if we are on the last stop in each cycle, but not end of day
                 if (i+1 < len(times_lr_ud)): #if end of day
-                    bus_stops[i%n][2] += [-1] #bus at end of day does not depart
+                    bus_stops[i%n][2] = -1 #bus at end of day does not depart
                 else:
-                    bus_stops[i%n][2] += [times_lr_ud[i+1]]#bus does not depart until the next cycle
+                    bus_stops[i%n][2] = times_lr_ud[i+1]#bus does not depart until the next cycle
             else:#otherwise the bus departs at the listed stop time
-                bus_stops[i%n][2] += [times_lr_ud[i]]
+                bus_stops[i%n][2] = times_lr_ud[i]
             
 
-        print(bus_stops)
+        #print(bus_stops)
 
         for stop in bus_stops:
             currentBus.addStop(stop)
