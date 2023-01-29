@@ -1,4 +1,5 @@
 from flask import Flask, request
+from flask import *
 from flask_restful import Resource, Api
 import sys
 import os
@@ -226,6 +227,8 @@ def adder_page():
                     </html>
                 '''.format(result=result,ArrivHour=ArrivHour,ArrivMin=ArrivMin)
 
+
+    return render_template("index.html"),# data=data)
     return '''
         <html>
             <body>
