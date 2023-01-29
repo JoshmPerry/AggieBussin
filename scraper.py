@@ -61,7 +61,7 @@ def get_bus_schedule(root_web_URL, routes, local_path_to_webdriver ):
         bus_stop_location_elements = (table_id.find_elements(By.TAG_NAME, "th"))[2:]
         bus_stops = []
         for element in bus_stop_location_elements:
-            bus_stops += [[0, element.text, 0]]
+            bus_stops += [[0, (element.text).split(" - TO ")[0], 0]]
         
         times_lr_ud_ids = table_id.find_elements(By.TAG_NAME, 'time')
         times_lr_ud = []

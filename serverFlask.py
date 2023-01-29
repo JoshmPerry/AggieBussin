@@ -6,7 +6,7 @@ from pymongo import MongoClient
 
 app = Flask(__name__)
 api = Api(app)
-port = 5100
+port = 8080
 
 
 
@@ -42,6 +42,7 @@ for i in range(len(really_almost_final_list)):
     else:
         final_list += [ really_almost_final_list[i] ]
 
+print(final_list)
 
 stops_today = set()
 for i in range(len(final_list)):
@@ -81,6 +82,25 @@ list1 = final_list
 def get_stops_today():
     return stops_today
 
+def findBusRoutesTo(location,Mlist):
+    options=[]
+    for stop in stops_today:
+        stop=stop.split(" - TO")[0]
+        if location!=stop:
+            temp=find_bus_for_stops(stop,location,Mlist)
+            if temp[0]!="NOPE":
+                options+=[temp+[stop]]
+    return options
+
+def findBusRoutesFrom(location,Mlist):
+    options=[]
+    for stop in stops_today:
+        stop=stop.split(" - TO")[0]
+        if location!=stop:
+            temp=find_bus_for_stops(location,stop,Mlist)
+            if temp[0]!="NOPE":
+                options+=[temp+[stop]]
+    return options
 
 def find_bus_for_stops(locationA, locationB, list2):
     best_time = 600
@@ -147,13 +167,47 @@ def adder_page():
         number2 = None
         locations=get_stops_today()
         number1 = request.form["number1"]
-        if not number1 in locations:
+        if not number1 in locations and number2!="":
             errors += "<p>{!r} is not a valid location for today.</p>\n".format(request.form["number1"])
         
         number2 = request.form["number2"]
-        if not number2 in locations:
+        if not number2 in locations and number2!="":
             errors += "<p>{!r} is not a valid location for today.</p>\n".format(request.form["number2"])
-        
+
+        if number1 in locations and number2=="":
+            toGoWhere=findBusRoutesFrom(number1,list1)
+            routes="<p>These are the bus rides from {loc}:</p>\n".format(loc=number1)
+            for place in toGoWhere:
+                ArrivHour=int(place[1]/60)
+                ArrivMin=place[1]%60
+                routes+="<p>There is a ride to {loc} at {ArrivHour}:{ArrivMin} lasting {time} minutes on bus {bus}<p>".format(loc=place[3],time=place[2],bus=place[0],ArrivHour=ArrivHour,ArrivMin=ArrivMin)
+            return '''
+                    <html>
+                        <body>
+                            {routes}
+                            <p><a href="/">Click here to find another bus route.</a>
+                        </body>
+                    </html>
+                '''.format(routes=routes)
+
+
+        if number2 in locations and number1=="":
+            toGoWhere=findBusRoutesFrom(number2,list1)
+            routes="<p>These are the bus rides to {loc}:</p>\n".format(loc=number2)
+            for place in toGoWhere:
+                ArrivHour=int(place[1]/60)
+                ArrivMin=place[1]%60
+                routes+="<p>There is a ride from {loc} at {ArrivHour}:{ArrivMin} lasting {time} minutes on bus {bus}<p>".format(loc=place[3],time=place[2],bus=place[0],ArrivHour=ArrivHour,ArrivMin=ArrivMin)
+            return '''
+                    <html>
+                        <body>
+                            {routes}
+                            <p><a href="/">Click here to find another bus route.</a>
+                        </body>
+                    </html>
+                '''.format(routes=routes)
+
+
         if number1 in locations and number2 in locations:
             
             result = find_bus_for_stops(number1,number2,list1)
@@ -165,9 +219,9 @@ def adder_page():
                 return '''
                     <html>
                         <body>
-                            <p>The result is {result[0]} bus at {ArrivHour}:{ArrivMin}.</p>
-                            <p>It should take roughly {result[2]} minutes to arrive at your destination.</p>
-                            <p><a href="/">Click here to calculate again</a>
+                            <p>You should take {result[0]} bus at {ArrivHour}:{ArrivMin}.</p>
+                            <p>It will take roughly {result[2]} minutes to arrive at your destination.</p>
+                            <p><a href="/">Click here to find another bus route.</a>
                         </body>
                     </html>
                 '''.format(result=result,ArrivHour=ArrivHour,ArrivMin=ArrivMin)
