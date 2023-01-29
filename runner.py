@@ -12,9 +12,10 @@ pathtoWebdriver="..\\chromedriver_win32\\chromedriver.exe"
 
 
 collection.drop()
-for curbus in scraper.get_bus_schedule(URL,routes,pathtoWebdriver):
+for num,curbus in enumerate(scraper.get_bus_schedule(URL,routes,pathtoWebdriver)):
     #print(curbus.getName())
-    dictionaryToAdd={"_id":curbus.getName().split()[0],"BusName":curbus.getName(),"Stops":curbus.getStops(),"Today":bool(curbus.getStops())}
+    for num2,stop in enumerate(curbus.getStops()):
+        dictionaryToAdd={"_id":num*100+num2,"BusName":curbus.getName(),"Stops":stop}
     collection.insert_one(dictionaryToAdd)
 
 
