@@ -160,7 +160,7 @@ if sys.argv.__len__() > 1:
     port = sys.argv[1]
 print("Api running on port : {} ".format(port))
 
-@app.route("/", methods=["GET", "POST"])
+@app.route("/bus", methods=["GET", "POST"])
 def adder_page():
     errors = ""
     if request.method == "POST":
@@ -228,7 +228,7 @@ def adder_page():
                 '''.format(result=result,ArrivHour=ArrivHour,ArrivMin=ArrivMin)
 
 
-    return render_template("index.html"),# data=data)
+    #return render_template("index.html"),# data=data)
     return '''
         <html>
             <body>
