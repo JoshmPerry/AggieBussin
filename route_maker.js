@@ -126,19 +126,43 @@ async function soonestRoutesAnywhere(fromt,tot,depT,arivT){
 
 async function findRoute(fromt,tot,Ltime){
   var midroutes=[];
-  midroutes[0]=await soonestRoutesAnywhere(fromt,"",Ltime,0);
-  var solutions=await soonestRoutesAnywhere("",tot,0,0);
-  var tmp = midroutes[0].filter(function(route){for(var t=0;t<solutions.length;t++){if(solutions[t]._id===route._id){return true;}}return false;});
-  if(tmp){
+  midroutes[0]=[0,await soonestRoutesAnywhere(fromt,"",Ltime,0)];
+  var solutions=await getRoute("",tot,0,0);
+  //console.log(midroutes[0][1]);
+  var tmp = midroutes[0][1].filter(function(route){for(var t=0;t<solutions.length;t++){if(solutions[t]._id===route._id){return true;}}return false;});
+  //console.log(tmp);
+  if(tmp.length>0){
+    //console.log("Why?");
     return tmp;
   }
 
   for(var depth=1;depth<5;depth++){
+    var tx=[];
+    for(var route=1;route<midroutes[depth-1][1].length;route++){
+      //console.log("Route: ",midroutes[depth-1][route][1]);
+      tx.push([route,await soonestRoutesAnywhere(midroutes[depth-1][route][1]["To"],"",midroutes[depth-1][route][1]["Arrival"],0)]);
+
+      //console.log(tx[route-1]);
+      
+
+      tmp = tx[route-1][1].filter(function(route){for(var t=0;t<solutions.length;t++){if(solutions[t]._id===route._id){return true;}}return false;});
+      //console.log(tmp);
+      if(tmp.length>0){
+        console.log("Yay.",route);
+        return tmp;
+      }
+
+    }
+    midroutes[depth]=tx;
+    console.log("Midroutes");
+    console.log(tx);
+
+    
 
   }
 
 }
 
-findRoute("HSC","MSC",0).then(value=>{console.log(value);});
+findRoute("Trigon","Laurel Ridge",780).then(value=>{console.log(value);});
 //getRoute("HSC","",0,0).then(value=>{console.log(value);});
 
