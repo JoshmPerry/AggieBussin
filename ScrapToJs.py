@@ -75,35 +75,14 @@ def get_bus_schedule(root_web_URL, routes, local_path_to_webdriver ):
                     times_lr_ud += [((int((t:=((timetext[:-1]).split(':')))[0]))*60 + (int(t[1])))]
             except:
                 None
-        print(times_lr_ud)
+        #print(times_lr_ud)
 
         #####################NEED TO CHANGE TYPE OF DATA FROM STOP BASED TO TRIP BASED#################################
         ###############################################################################################################
-
-
-        for i in range(len(times_lr_ud)):
-            n = len(bus_stops)
-            if(i%n == 0 and i-1 >= 0): #if this is the first stop in the cycle, after the start of the day
-                bus_stops[i%n][0] = times_lr_ud[i-1] #it has a special arrival time
-            else: #on normal stops, arival is one minute prior to departure
-                bus_stops[i%n][0] = times_lr_ud[i] - 1
-            
-            if(i%n == n-1): #if we are on the last stop in each cycle, but not end of day
-                if (i+1 < len(times_lr_ud)): #if end of day
-                    bus_stops[i%n][2] = -1 #bus at end of day does not depart
-                else:
-                    try:
-                        bus_stops[i%n][2] = times_lr_ud[i+1]#bus does not depart until the next cycle
-                    except:
-                        bus_stops[i%n][2]=times_lr_ud[i]
-            else:#otherwise the bus departs at the listed stop time
-                bus_stops[i%n][2] = times_lr_ud[i]
-            
-
-        #print(bus_stops)
-
-        for stop in bus_stops:
-            currentBus.addTrip(stop)
+        n = len(bus_stops)
+        for i in range(len(times_lr_ud)-1):
+            if(i%n!=n-1):
+                bus.addTrip([times_lr_ud[i],bus_stops[i%n],times_lr_ud[i+1],bus_stops[(i+1)%n]])
 
         bus_list += [currentBus]
 
@@ -118,17 +97,15 @@ collection = database["buses"]
 routes={12,15,22,26,27,31,34,35,36,40,47,48, '47-48', 'N15',"01","01-04","03","03-05","04","05","06","07","08"}
 URL='https://transport.tamu.edu/busroutes/Routes.aspx?r='
 pathtoWebdriver="..\\chromedriver_win32\\chromedriver.exe"
-
 print("Starting Uploading process...")
 collection.drop()
 for num,curbus in enumerate(get_bus_schedule(URL,routes,pathtoWebdriver)):
     print("Uploading",curbus.getName(),"to Database.")
-    #for num2,stop in enumerate(curbus.getStops()):
-        #if(stop[0]!=0 or stop[2]!=0):
-            #dictionaryToAdd={"_id":num*100+num2,"BusName":curbus.getName(),"Arrival":stop[0],"Departure":stop[2],"Location":stop[1]}
-    dictionaryToAdd={"_id":num,"BusName":curbus.getName(),"Stop":curbus.getTrips()}
-    collection.insert_one(dictionaryToAdd)
-
+    #print(curbus.getTrips())
+    for num2,stop in enumerate(curbus.getTrips()):
+        dictionaryToAdd={"_id":num*100+num2,"BusName":curbus.getName(),"To":stop[3],"From":stop[1],"Arrival":stop[2],"Departure":stop[0]}
+        collection.insert_one(dictionaryToAdd)
+#collection.insert_one({"_id":1,"BusName":"Help me","To":"North Side","From":"South Side","Arrival":1500,"Departure":1450})
 
 print("finished")
 
