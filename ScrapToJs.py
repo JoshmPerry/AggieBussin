@@ -62,7 +62,7 @@ def get_bus_schedule(root_web_URL, routes, local_path_to_webdriver ):
         bus_stop_location_elements = (table_id.find_elements(By.TAG_NAME, "th"))[2:]
         bus_stops = []
         for element in bus_stop_location_elements:
-            bus_stops += [[0, (element.text).split(" - TO ")[0], 0]]
+            bus_stops += [(element.text).split(" - TO ")[0]]
         
         times_lr_ud_ids = table_id.find_elements(By.TAG_NAME, 'time')
         times_lr_ud = []
@@ -82,8 +82,8 @@ def get_bus_schedule(root_web_URL, routes, local_path_to_webdriver ):
         n = len(bus_stops)
         for i in range(len(times_lr_ud)-1):
             if(i%n!=n-1):
-                bus.addTrip([times_lr_ud[i],bus_stops[i%n],times_lr_ud[i+1],bus_stops[(i+1)%n]])
-
+                currentBus.addTrip([times_lr_ud[i],bus_stops[i%n],times_lr_ud[i+1],bus_stops[(i+1)%n]])
+        
         bus_list += [currentBus]
 
     return bus_list
@@ -100,10 +100,11 @@ pathtoWebdriver="..\\chromedriver_win32\\chromedriver.exe"
 print("Starting Uploading process...")
 collection.drop()
 for num,curbus in enumerate(get_bus_schedule(URL,routes,pathtoWebdriver)):
-    print("Uploading",curbus.getName(),"to Database.")
+    print("Uploading",curbus.getName(),"to Database.",num)
     #print(curbus.getTrips())
     for num2,stop in enumerate(curbus.getTrips()):
-        dictionaryToAdd={"_id":num*100+num2,"BusName":curbus.getName(),"To":stop[3],"From":stop[1],"Arrival":stop[2],"Departure":stop[0]}
+        dictionaryToAdd={"_id":((num+1)*1000)+(1+num2),"BusName":curbus.getName(),"To":stop[3],"From":stop[1],"Arrival":stop[2]-2,"Departure":stop[0]-1}
+        #print(dictionaryToAdd)
         collection.insert_one(dictionaryToAdd)
 #collection.insert_one({"_id":1,"BusName":"Help me","To":"North Side","From":"South Side","Arrival":1500,"Departure":1450})
 
