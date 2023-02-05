@@ -1,22 +1,29 @@
 
 const { MongoClient } = require('mongodb')
 
-function getDatabase(fromt,tot) {
+function getRoute(fromt,tot) {
   const CONNECTION_STRING = "mongodb+srv://viewBusses:QUm3dDDHTDrdwW7k@cluster0.cana0cv.mongodb.net/test?retryWrites=true&w=majority";
   const client = new MongoClient(CONNECTION_STRING, { useNewUrlParser: true });
   var db = client.db("mydatabase");
   if(fromt===""){
-  if(tot===""){
-    return db.collection("buses").find({}).toArray();
+    if(tot===""){
+      return db.collection("buses").find({}).toArray();
+    }
+    return db.collection("buses").find({To:tot}).toArray();
+  }else{
+    if(tot===""){
+      return db.collection("buses").find({From:fromt}).toArray();
+    }
+    return db.collection("buses").find({From:fromt,To:tot}).toArray();
   }
-  return db.collection("buses").find({to:tot}).toArray();
-}else{
-  if(tot===""){
-    return db.collection("buses").find({from:fromt}).toArray();
-  }
-  return db.collection("buses").find({from:fromt,to:tot}).toArray();
 }
+
+async function findRoute(fromt,tot){
+  var 
+
 }
-getDatabase().then(value=>{console.log(value);});
+
+getRoute("","North Side").then(value=>{console.log(value);});
+
 
 
