@@ -1,67 +1,75 @@
 
 const { MongoClient } = require('mongodb')
 
-function getRoute(fromt,tot,depT,arivT) {
+function getDatabase(){
   const CONNECTION_STRING = "mongodb+srv://viewBusses:QUm3dDDHTDrdwW7k@cluster0.cana0cv.mongodb.net/test?retryWrites=true&w=majority";
   const client = new MongoClient(CONNECTION_STRING, { useNewUrlParser: true });
   var db = client.db("mydatabase");
+  return db.collection("buses").find({}).toArray();
+}
+
+var database=getDatabase();
+
+async function getRoute(fromt,tot,depT,arivT) {
+  var data = await database;
 
   if(depT===0&&arivT===0){
 
     if(fromt===""){
       if(tot===""){
-        return db.collection("buses").find({}).toArray();
+        return data;
       }
-      return db.collection("buses").find({To:tot}).toArray();
+      return data.filter(function(tod){return tod.To===tot;});
     }else{
       if(tot===""){
-        return db.collection("buses").find({From:fromt}).toArray();
+        return data.filter(function(tod){return tod.From===fromt;});
       }
-      return db.collection("buses").find({From:fromt,To:tot}).toArray();
+      return data.filter(function(tod){return tod.From===fromt&&tod.To===tot;});
     }
 
   }else if(depT===0&&arivT!==0){
 
     if(fromt===""){
       if(tot===""){
-        return db.collection("buses").find({Arrival:{$lt:arivT}}).toArray();
+        return data.filter(function(tod){return tod.Arrival<arivT;});
       }
-      return db.collection("buses").find({To:tot,Arrival:{$lt:arivT}}).toArray();
+      return data.filter(function(tod){return tod.To===tot&&tod.Arrival<arivT;});
     }else{
       if(tot===""){
-        return db.collection("buses").find({From:fromt,Arrival:{$lt:arivT}}).toArray();
+        return data.filter(function(tod){return tod.From===fromt&&tod.Arrival<arivT;});
       }
-      return db.collection("buses").find({From:fromt,To:tot,Arrival:{$lt:arivT}}).toArray();
+      return data.filter(function(tod){return tod.From===fromt&&tod.To===tot&&tod.Arrival<arivT;});
     }
 
   }else if(depT!==0&&arivT==0){
 
     if(fromt===""){
       if(tot===""){
-        return db.collection("buses").find({Departure:{$gt:depT}}).toArray();
+        return data;
       }
-      return db.collection("buses").find({To:tot,Departure:{$gt:depT}}).toArray();
+      return data.filter(function(tod){return tod.To===tot&&tod.Departure>depT;});
     }else{
       if(tot===""){
-        return db.collection("buses").find({From:fromt,Departure:{$gt:depT}}).toArray();
+        return data.filter(function(tod){return tod.From===fromt&&tod.Departure>depT;});
       }
-      return db.collection("buses").find({From:fromt,To:tot,Departure:{$gt:depT}}).toArray();
+      return data.filter(function(tod){return tod.From===fromt&&tod.To===tot&&tod.Departure>depT;});
     }
 
   }else{
 
     if(fromt===""){
       if(tot===""){
-        return db.collection("buses").find({Arrival:{$lt:arivT},Departure:{$gt:depT}}).toArray();
+        return data.filter(function(tod){return tod.Arrival<arivT&&tod.Departure>depT;});
       }
-      return db.collection("buses").find({To:tot,Arrival:{$lt:arivT},Departure:{$gt:depT}}).toArray();
+      return data.filter(function(tod){return tod.To===tot&&tod.Arrival<arivT&&tod.Departure>depT;});
     }else{
       if(tot===""){
-        return db.collection("buses").find({From:fromt,Arrival:{$lt:arivT},Departure:{$gt:depT}}).toArray();
+        return data.filter(function(tod){return tod.From===fromt&&tod.Arrival<arivT&&tod.Departure>depT;});
       }
-      return db.collection("buses").find({From:fromt,To:tot,Arrival:{$lt:arivT},Departure:{$gt:depT}}).toArray();
+      return data.filter(function(tod){return tod.From===fromt&&tod.To===tot&&tod.Arrival<arivT&&tod.Departure>depT;});
     }
   }
+  
 }
 
 async function soonestRoutes(fromt,tot,depT,arivT){
@@ -117,17 +125,20 @@ async function soonestRoutesAnywhere(fromt,tot,depT,arivT){
 }
 
 async function findRoute(fromt,tot,Ltime){
-  var midman=await soonestRoutesAnywhere("",fromt,0,Ltime);
   var midroutes=[];
-  for(var i=0;i<(midman).length;i++){
-    //console.log(midman[i]);
-    midroutes[i]=soonestRoutesAnywhere("",midman[i],0,midman[i]["Arrival"]);
+  midroutes[0]=await soonestRoutesAnywhere(fromt,"",Ltime,0);
+  var solutions=await soonestRoutesAnywhere("",tot,0,0);
+  var tmp = midroutes[0].filter(function(route){for(var t=0;t<solutions.length;t++){if(solutions[t]._id===route._id){return true;}}return false;});
+  if(tmp){
+    return tmp;
+  }
+
+  for(var depth=1;depth<5;depth++){
 
   }
 
 }
 
-soonestRoutes("","MSC",799,0).then(value=>{console.log(value);});
-
-
+findRoute("HSC","MSC",0).then(value=>{console.log(value);});
+//getRoute("HSC","",0,0).then(value=>{console.log(value);});
 
