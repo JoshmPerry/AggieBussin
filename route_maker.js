@@ -2,7 +2,7 @@
 const { MongoClient } = require('mongodb')
 
 function getDatabase(fromt,tot) {
-  const CONNECTION_STRING = "mongodb+srv://JoshmPerry:duPLYKDpBM11HfbB@cluster0.cana0cv.mongodb.net/test?retryWrites=true&w=majority";
+  const CONNECTION_STRING = "mongodb+srv://viewBusses:QUm3dDDHTDrdwW7k@cluster0.cana0cv.mongodb.net/test?retryWrites=true&w=majority";
   const client = new MongoClient(CONNECTION_STRING, { useNewUrlParser: true });
   var db = client.db("mydatabase");
   if(fromt===""){
