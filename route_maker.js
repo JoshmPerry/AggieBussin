@@ -160,6 +160,6 @@ async function findRoute(fromt,tot,Ltime){
 return"DNF";
 }
 
-findRoute("Trigon","Holleman Oaks - North",0).then(value=>{console.log(value);});
+findRoute("Trigon","Ashburn",0).then(value=>{console.log(value);});
 //getRoute("HSC","",0,0).then(value=>{console.log(value);});
 
