@@ -124,65 +124,40 @@ async function soonestRoutesAnywhere(fromt,tot,depT,arivT){
   return fastperbus;
 }
 
-async function searchRoute(deep,givenlocation,wantedRoutes){
-
-  
+async function searchRoute(deep,givenlocation,solutions){
+  var tmp=await soonestRoutesAnywhere(givenlocation["To"],"",givenlocation["Arrival"],0);
+  if(deep===0){
+    var goodroute=tmp.find(function(route){for(var t=0;t<solutions.length;t++){if(solutions[t]._id===route._id){return true;}}return false;});
+    return (goodroute) ? [goodroute] : false;
+  }
+  for(var i=0;i<tmp.length;i++){
+    var poSolution=await searchRoute(deep-1,tmp[i],solutions);
+    if(poSolution){
+      var returnstat=[tmp[i]];
+    return returnstat.concat(poSolution);
+    }
+  }
+  return false;
 }
 
 async function findRoute(fromt,tot,Ltime){
-  var midroutes=[];
-  midroutes[0]=[[-1,[await soonestRoutesAnywhere(fromt,"",Ltime,0)]]];
+  var midroutes=await soonestRoutesAnywhere(fromt,"",Ltime,0);
   var solutions=await getRoute("",tot,0,0);
-  //console.log(midroutes[0][1][0],Array.isArray(midroutes[0][1][0]));
-  var tmp = midroutes[0][0][1][0].filter(function(route){for(var t=0;t<solutions.length;t++){if(solutions[t]._id===route._id){return true;}}return false;});
-  //console.log(tmp);
-  if(tmp.length>0){
-    //console.log("Why?");
-    return tmp;
-  }
-  for(var depth=1;depth<4;depth++){
-    console.log("Made it1");
-
-    var tx=[];//This should not be here
-    //console.log("Routes for",depth,midroutes);
-    //console.log(midroutes[depth-1]);
-    for(var route=1;route<midroutes[depth-1][0].length;route++){
-      //console.log(route,midroutes[depth-1][0][route][0]);
-      console.log("Made it2");
-
-      for(var route2=0;route2<midroutes[depth-1][0][route][0].length;route2++){
-        console.log("Made it3");
-
-      //console.log("Route: ",midroutes,depth-1);
-      //console.log(midroutes[depth-1][0][route][0][route2],depth,route,route2);
-      //console.log("now");
-      tx.push([route2,[await soonestRoutesAnywhere(midroutes[depth-1][0][route][0][route2]["To"],"",midroutes[depth-1][0][route][0][route2]["Arrival"],0)]]);
-      //console.log(midroutes);
-      //console.log(route,route2);
-      //console.log(await soonestRoutesAnywhere(midroutes[depth-1][1][route2]["To"],"",midroutes[depth-1][1][route2]["Arrival"],0));
-
-      tmp = tx[route2][1][route-1].filter(function(route){for(var t=0;t<solutions.length;t++){if(solutions[t]._id===route._id){return true;}}return false;});
-      //console.log(tmp);
-      if(tmp.length>0){
-
-        console.log("Yay.",route);
-        return tmp;
+  var tmp = midroutes.find(function(route){for(var t=0;t<solutions.length;t++){if(solutions[t]._id===route._id){return true;}}return false;});
+  if (tmp) return [tmp];
+  for(var depth=1;depth<6;depth++){
+    for(var i=0;i<midroutes.length;i++){
+      var poSolution=await searchRoute(depth-1,midroutes[i],solutions);
+      if(poSolution){
+        var returnstat=[midroutes[i]];
+        //console.log(poSolution);
+        return returnstat.concat(poSolution);
       }
-
     }
 
-
   }
-    //console.log("Route",depth,tx);
-    midroutes[depth]=tx;
-    //console.log("Midroutes",midroutes);
-    //console.log(tx);
-  
-    
 
-  }
-console.log(midroutes);
-return"Error,Didn't find";
+return"DNF";
 }
 
 findRoute("Trigon","Holleman Oaks - North",0).then(value=>{console.log(value);});

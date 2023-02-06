@@ -70,9 +70,9 @@ def get_bus_schedule(root_web_URL, routes, local_path_to_webdriver ):
             timetext = time_id.text
             try:
                 if(timetext[-1] == 'P'):
-                    times_lr_ud += [((int((t:=((timetext[:-1]).split(':')))[0])+12)*60 + (int(t[1])))]
+                    times_lr_ud += [((int((((timetext[:-1]).split(':')))[0])+12)*60 + (int(((timetext[:-1]).split(':'))[1])))]
                 else:
-                    times_lr_ud += [((int((t:=((timetext[:-1]).split(':')))[0]))*60 + (int(t[1])))]
+                    times_lr_ud += [((int((((timetext[:-1]).split(':')))[0]))*60 + (int(((timetext[:-1]).split(':'))[1])))]
             except:
                 None
         #print(times_lr_ud)
